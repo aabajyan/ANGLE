@@ -172,7 +172,23 @@ if (USE_ANGLE_EGL OR ENABLE_WEBGL)
         LIBANGLE_IMPLEMENTATION
     )
     target_compile_definitions(ANGLE PUBLIC ${ANGLE_DEFINITIONS})
-    target_link_libraries(ANGLE PRIVATE ZLIB::ZLIB ${CMAKE_DL_LIBS})
+
+    # Check if ZLIB::ZLIB is available, otherwise fetch zlib from GitHub
+    find_package(ZLIB QUIET)
+    if (NOT ZLIB_FOUND)
+        include(FetchContent)
+        FetchContent_Declare(
+            zlib
+            GIT_REPOSITORY https://github.com/madler/zlib.git
+            GIT_TAG v1.3.1
+        )
+        FetchContent_MakeAvailable(zlib)
+        set(ZLIB_LIB zlib)
+    else()
+        set(ZLIB_LIB ZLIB::ZLIB)
+    endif()
+
+    target_link_libraries(ANGLE PRIVATE ${ZLIB_LIB} ${CMAKE_DL_LIBS})
 
     target_compile_definitions(ANGLEFramework INTERFACE ${gl_prototypes})
 
