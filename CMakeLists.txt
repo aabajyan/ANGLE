@@ -12,7 +12,13 @@ include("${CMAKE_CURRENT_SOURCE_DIR}/webkit_patches/cmake/WebKitMacros-minimal.c
 include("${CMAKE_CURRENT_SOURCE_DIR}/webkit_patches/cmake/DetectSSE2.cmake")
 
 if (APPLE)
-    set(is_mac TRUE)
+    if(IOS)
+        set(is_ios TRUE)
+    else()
+        set(is_mac TRUE)
+    endif()
+    
+    set(is_apple TRUE)
 elseif (WIN32)
     set(is_win TRUE)
     set(angle_enable_d3d9 TRUE)

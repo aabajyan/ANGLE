@@ -222,3 +222,22 @@ index 573c439..95a3d2e 100644
  
  # ANGLE makes a number of small static libraries that are then joined into a
  # bigger library that is built shared. Rather than making the small libraries
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 95a3d2e..1af0c22 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -12,7 +12,13 @@ include("${CMAKE_CURRENT_SOURCE_DIR}/webkit_patches/cmake/WebKitMacros-minimal.c
+ include("${CMAKE_CURRENT_SOURCE_DIR}/webkit_patches/cmake/DetectSSE2.cmake")
+ 
+ if (APPLE)
+-    set(is_mac TRUE)
++    if(IOS)
++        set(is_ios TRUE)
++    else()
++        set(is_mac TRUE)
++    endif()
++    
++    set(is_apple TRUE)
+ elseif (WIN32)
+     set(is_win TRUE)
+     set(angle_enable_d3d9 TRUE)
