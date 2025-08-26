@@ -195,3 +195,30 @@ index a77fb30..573c439 100644
  
      target_compile_definitions(ANGLEFramework INTERFACE ${gl_prototypes})
  
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 573c439..95a3d2e 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -44,11 +44,17 @@ set(gl_prototypes
+     EGL_EGLEXT_PROTOTYPES
+ )
+ 
+-# Default library types for ANGLE
+-# Override these in Platform*.cmake for your port as needed.
+-set(ANGLE_LIBRARY_TYPE STATIC)
+-set(GLESv2_LIBRARY_TYPE STATIC)
+-set(EGL_LIBRARY_TYPE STATIC)
++option(BUILD_SHARED_LIBS "Build ANGLE libraries as shared" OFF)
++set(ANGLE_LIBRARY_TYPE "STATIC" CACHE STRING "Library type for ANGLE (STATIC or SHARED)")
++set(GLESv2_LIBRARY_TYPE "STATIC" CACHE STRING "Library type for GLESv2 (STATIC or SHARED)")
++set(EGL_LIBRARY_TYPE "STATIC" CACHE STRING "Library type for EGL (STATIC or SHARED)")
++
++# If BUILD_SHARED_LIBS is ON, set all library types to SHARED
++if(BUILD_SHARED_LIBS)
++    set(ANGLE_LIBRARY_TYPE SHARED)
++    set(GLESv2_LIBRARY_TYPE SHARED)
++    set(EGL_LIBRARY_TYPE SHARED)
++endif()
+ 
+ # ANGLE makes a number of small static libraries that are then joined into a
+ # bigger library that is built shared. Rather than making the small libraries
