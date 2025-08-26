@@ -25,6 +25,20 @@ void ContextImpl::invalidateTexture(gl::TextureType target)
     UNREACHABLE();
 }
 
+angle::Result ContextImpl::startTiling(const gl::Context *context,
+                                       const gl::Rectangle &area,
+                                       GLbitfield preserveMask)
+{
+    UNREACHABLE();
+    return angle::Result::Stop;
+}
+
+angle::Result ContextImpl::endTiling(const gl::Context *context, GLbitfield preserveMask)
+{
+    UNREACHABLE();
+    return angle::Result::Stop;
+}
+
 angle::Result ContextImpl::onUnMakeCurrent(const gl::Context *context)
 {
     return angle::Result::Continue;
@@ -66,6 +80,10 @@ egl::Error ContextImpl::reacquireHighPowerGPU(gl::Context *)
     return egl::NoError();
 }
 
+void ContextImpl::acquireExternalContext(const gl::Context *context) {}
+
+void ContextImpl::releaseExternalContext(const gl::Context *context) {}
+
 angle::Result ContextImpl::acquireTextures(const gl::Context *context,
                                            const gl::TextureBarrierVector &textureBarriers)
 {
@@ -86,24 +104,12 @@ const angle::PerfMonitorCounterGroups &ContextImpl::getPerfMonitorCounters()
     return *sCounters;
 }
 
-angle::Result ContextImpl::drawPixelLocalStorageEXTEnable(gl::Context *,
-                                                          GLsizei n,
-                                                          const gl::PixelLocalStoragePlane[],
-                                                          const GLenum loadops[])
+angle::Result ContextImpl::bindMetalRasterizationRateMap(gl::Context *,
+                                                         RenderbufferImpl *renderbuffer,
+                                                         GLMTLRasterizationRateMapANGLE map)
 {
-    ASSERT(getNativePixelLocalStorageOptions().type ==
-           ShPixelLocalStorageType::PixelLocalStorageEXT);
     UNREACHABLE();
     return angle::Result::Stop;
 }
 
-angle::Result ContextImpl::drawPixelLocalStorageEXTDisable(gl::Context *,
-                                                           const gl::PixelLocalStoragePlane[],
-                                                           const GLenum storeops[])
-{
-    ASSERT(getNativePixelLocalStorageOptions().type ==
-           ShPixelLocalStorageType::PixelLocalStorageEXT);
-    UNREACHABLE();
-    return angle::Result::Stop;
-}
 }  // namespace rx

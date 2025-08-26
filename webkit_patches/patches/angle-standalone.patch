@@ -1,0 +1,168 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 4e9fbde..ef980c1 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -1,5 +1,15 @@
++cmake_minimum_required(VERSION 3.10)
++set(CMAKE_CXX_STANDARD 17)
++set(CMAKE_CXX_STANDARD_REQUIRED ON)
++set(CMAKE_CXX_EXTENSIONS OFF)
+ set_property(DIRECTORY . PROPERTY FOLDER "ANGLE")
+ 
++# Include minimal WebKit cmake files for standalone build
++include("${CMAKE_CURRENT_SOURCE_DIR}/webkit_patches/cmake/WebKitCommon-minimal.cmake")
++include("${CMAKE_CURRENT_SOURCE_DIR}/webkit_patches/cmake/WebKitCompilerFlags-minimal.cmake")
++include("${CMAKE_CURRENT_SOURCE_DIR}/webkit_patches/cmake/WebKitMacros-minimal.cmake")
++include("${CMAKE_CURRENT_SOURCE_DIR}/webkit_patches/cmake/DetectSSE2.cmake")
++
+ if (APPLE)
+     set(is_mac TRUE)
+ elseif (WIN32)
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index ef980c1..63c6b2f 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -267,3 +267,14 @@ target_link_libraries(ANGLEFramework INTERFACE ANGLE)
+ target_include_directories(ANGLEFramework INTERFACE ${ANGLE_FRAMEWORK_HEADERS_DIR})
+ 
+ add_library(ANGLE::ANGLE ALIAS ANGLEFramework)
++
++# Install targets and headers
++install(TARGETS ANGLE GLESv2 EGL
++    EXPORT ANGLETargets
++    ARCHIVE DESTINATION lib
++    LIBRARY DESTINATION lib
++    RUNTIME DESTINATION bin
++)
++install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/
++    DESTINATION include
++)
+\ No newline at end of file
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index fef43b8..5f7634d 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -1,3 +1,4 @@
++project(ANGLE LANGUAGES C CXX)
+ cmake_minimum_required(VERSION 3.10)
+ set(CMAKE_CXX_STANDARD 17)
+ set(CMAKE_CXX_STANDARD_REQUIRED ON)
+@@ -269,12 +270,27 @@ target_include_directories(ANGLEFramework INTERFACE ${ANGLE_FRAMEWORK_HEADERS_DI
+ add_library(ANGLE::ANGLE ALIAS ANGLEFramework)
+ 
+ # Install targets and headers
+-install(TARGETS ANGLE GLESv2 EGL
+-    EXPORT ANGLETargets
+-    ARCHIVE DESTINATION lib
+-    LIBRARY DESTINATION lib
+-    RUNTIME DESTINATION bin
+-)
+-install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/
+-    DESTINATION include
+-)
+\ No newline at end of file
++if(TARGET ANGLE)
++    install(TARGETS ANGLE
++        EXPORT ANGLETargets
++        ARCHIVE DESTINATION lib
++        LIBRARY DESTINATION lib
++        RUNTIME DESTINATION bin
++    )
++endif()
++if(TARGET GLESv2)
++    install(TARGETS GLESv2
++        EXPORT ANGLETargets
++        ARCHIVE DESTINATION lib
++        LIBRARY DESTINATION lib
++        RUNTIME DESTINATION bin
++    )
++endif()
++if(TARGET EGL)
++    install(TARGETS EGL
++        EXPORT ANGLETargets
++        ARCHIVE DESTINATION lib
++        LIBRARY DESTINATION lib
++        RUNTIME DESTINATION bin
++    )
++endif()
+\ No newline at end of file
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 5f7634d..9d4cdf1 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -293,4 +293,8 @@ if(TARGET EGL)
+         LIBRARY DESTINATION lib
+         RUNTIME DESTINATION bin
+     )
+-endif()
+\ No newline at end of file
++endif()
++
++install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/
++    DESTINATION include
++)
+\ No newline at end of file
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 9d4cdf1..a77fb30 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -101,6 +101,20 @@ set(ANGLE_SOURCES
+     src/libANGLE/capture/serialize_mock.cpp
+ )
+ 
++
++# Include the correct platform-specific CMake file
++if (APPLE)
++    include(PlatformMac.cmake)
++elseif (WIN32)
++    include(PlatformWin.cmake)
++elseif (UNIX AND NOT APPLE)
++    # Optionally include GTK or WPE for UNIX
++    include(PlatformGTK.cmake)
++    include(PlatformWPE.cmake)
++elseif (DEFINED PLAYSTATION)
++    include(PlatformPlayStation.cmake)
++endif()
++
+ if (WIN32)
+     # FIXME: DX11 support will not compile if this preprocessor definition is set
+     # DirectX Documentation is setting that version to 0x700 but there is no
+diff --git a/PlatformMac.cmake b/PlatformMac.cmake
+index cbf1d1d..f29abd0 100644
+--- a/PlatformMac.cmake
++++ b/PlatformMac.cmake
+@@ -10,12 +10,19 @@ list(APPEND ANGLE_SOURCES
+     ${metal_backend_sources}
+ 
+     ${angle_translator_lib_metal_sources}
++    ${angle_translator_lib_msl_sources}
++    ${angle_translator_glsl_apple_sources}
+ 
+-    ${libangle_gpu_info_util_mac_sources}
+     ${libangle_gpu_info_util_sources}
+     ${libangle_mac_sources}
+ )
+ 
++if(IOS)
++    list(APPEND ANGLE_SOURCES ${libangle_gpu_info_util_ios_sources})
++else()
++    list(APPEND ANGLE_SOURCES ${libangle_gpu_info_util_mac_sources})
++endif()
++
+ list(APPEND ANGLE_DEFINITIONS
+     ANGLE_ENABLE_METAL
+ )
+@@ -26,5 +33,11 @@ list(APPEND ANGLEGLESv2_LIBRARIES
+     ${IOKIT_LIBRARY}
+     ${IOSURFACE_LIBRARY}
+     ${METAL_LIBRARY}
+-    ${QUARTZ_LIBRARY}
+ )
++
++if (NOT IOS)
++    find_library(QUARTZ_LIBRARY Quartz)
++    list(APPEND ANGLEGLESv2_LIBRARIES
++        ${QUARTZ_LIBRARY}
++    )
++endif()
+\ No newline at end of file

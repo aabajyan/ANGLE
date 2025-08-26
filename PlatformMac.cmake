@@ -10,11 +10,18 @@ list(APPEND ANGLE_SOURCES
     ${metal_backend_sources}
 
     ${angle_translator_lib_metal_sources}
+    ${angle_translator_lib_msl_sources}
+    ${angle_translator_glsl_apple_sources}
 
-    ${libangle_gpu_info_util_mac_sources}
     ${libangle_gpu_info_util_sources}
     ${libangle_mac_sources}
 )
+
+if(IOS)
+    list(APPEND ANGLE_SOURCES ${libangle_gpu_info_util_ios_sources})
+else()
+    list(APPEND ANGLE_SOURCES ${libangle_gpu_info_util_mac_sources})
+endif()
 
 list(APPEND ANGLE_DEFINITIONS
     ANGLE_ENABLE_METAL
@@ -26,5 +33,11 @@ list(APPEND ANGLEGLESv2_LIBRARIES
     ${IOKIT_LIBRARY}
     ${IOSURFACE_LIBRARY}
     ${METAL_LIBRARY}
-    ${QUARTZ_LIBRARY}
 )
+
+if (NOT IOS)
+    find_library(QUARTZ_LIBRARY Quartz)
+    list(APPEND ANGLEGLESv2_LIBRARIES
+        ${QUARTZ_LIBRARY}
+    )
+endif()

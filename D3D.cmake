@@ -16,8 +16,6 @@ set(d3d_shared_sources
     "src/libANGLE/renderer/d3d/CompilerD3D.cpp"
     "src/libANGLE/renderer/d3d/CompilerD3D.h"
     "src/libANGLE/renderer/d3d/ContextD3D.h"
-    "src/libANGLE/renderer/d3d/DeviceD3D.cpp"
-    "src/libANGLE/renderer/d3d/DeviceD3D.h"
     "src/libANGLE/renderer/d3d/DisplayD3D.cpp"
     "src/libANGLE/renderer/d3d/DisplayD3D.h"
     "src/libANGLE/renderer/d3d/DynamicHLSL.cpp"
@@ -40,6 +38,8 @@ set(d3d_shared_sources
     "src/libANGLE/renderer/d3d/NativeWindowD3D.h"
     "src/libANGLE/renderer/d3d/ProgramD3D.cpp"
     "src/libANGLE/renderer/d3d/ProgramD3D.h"
+    "src/libANGLE/renderer/d3d/ProgramExecutableD3D.cpp"
+    "src/libANGLE/renderer/d3d/ProgramExecutableD3D.h"
     "src/libANGLE/renderer/d3d/RenderTargetD3D.cpp"
     "src/libANGLE/renderer/d3d/RenderTargetD3D.h"
     "src/libANGLE/renderer/d3d/RenderbufferD3D.cpp"
@@ -67,13 +67,6 @@ set(d3d_shared_sources
     "src/libANGLE/renderer/d3d/formatutilsD3D.h"
 )
 
-if(NOT angle_is_winuwp)
-    list(APPEND d3d_shared_sources
-        "src/libANGLE/renderer/d3d/../../../third_party/systeminfo/SystemInfo.cpp"
-        "src/libANGLE/renderer/d3d/../../../third_party/systeminfo/SystemInfo.h"
-    )
-endif()
-
 if(angle_enable_d3d9)
     set(d3d9_backend_sources
         "src/libANGLE/renderer/d3d/d3d9/Blit9.cpp"
@@ -84,6 +77,8 @@ if(angle_enable_d3d9)
         "src/libANGLE/renderer/d3d/d3d9/Context9.h"
         "src/libANGLE/renderer/d3d/d3d9/DebugAnnotator9.cpp"
         "src/libANGLE/renderer/d3d/d3d9/DebugAnnotator9.h"
+        "src/libANGLE/renderer/d3d/d3d9/Device9.cpp"
+        "src/libANGLE/renderer/d3d/d3d9/Device9.h"
         "src/libANGLE/renderer/d3d/d3d9/Fence9.cpp"
         "src/libANGLE/renderer/d3d/d3d9/Fence9.h"
         "src/libANGLE/renderer/d3d/d3d9/Framebuffer9.cpp"
@@ -143,6 +138,8 @@ if(angle_enable_d3d11)
         "src/libANGLE/renderer/d3d/d3d11/Context11.h"
         "src/libANGLE/renderer/d3d/d3d11/DebugAnnotator11.cpp"
         "src/libANGLE/renderer/d3d/d3d11/DebugAnnotator11.h"
+        "src/libANGLE/renderer/d3d/d3d11/Device11.cpp"
+        "src/libANGLE/renderer/d3d/d3d11/Device11.h"
         "src/libANGLE/renderer/d3d/d3d11/ExternalImageSiblingImpl11.cpp"
         "src/libANGLE/renderer/d3d/d3d11/ExternalImageSiblingImpl11.h"
         "src/libANGLE/renderer/d3d/d3d11/Fence11.cpp"
@@ -201,12 +198,10 @@ if(angle_enable_d3d11)
         "src/libANGLE/renderer/d3d/d3d11/shaders/compiled/buffertotexture11_ps_4i.h"
         "src/libANGLE/renderer/d3d/d3d11/shaders/compiled/buffertotexture11_ps_4ui.h"
         "src/libANGLE/renderer/d3d/d3d11/shaders/compiled/buffertotexture11_vs.h"
-        "src/libANGLE/renderer/d3d/d3d11/shaders/compiled/clear11_fl9vs.h"
         "src/libANGLE/renderer/d3d/d3d11/shaders/compiled/clear11multiviewgs.h"
         "src/libANGLE/renderer/d3d/d3d11/shaders/compiled/clear11multiviewvs.h"
         "src/libANGLE/renderer/d3d/d3d11/shaders/compiled/clear11vs.h"
         "src/libANGLE/renderer/d3d/d3d11/shaders/compiled/cleardepth11ps.h"
-        "src/libANGLE/renderer/d3d/d3d11/shaders/compiled/clearfloat11_fl9ps.h"
         "src/libANGLE/renderer/d3d/d3d11/shaders/compiled/clearfloat11ps1.h"
         "src/libANGLE/renderer/d3d/d3d11/shaders/compiled/clearfloat11ps2.h"
         "src/libANGLE/renderer/d3d/d3d11/shaders/compiled/clearfloat11ps3.h"

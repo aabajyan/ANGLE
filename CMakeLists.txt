@@ -1,12 +1,25 @@
+project(ANGLE LANGUAGES C CXX)
+cmake_minimum_required(VERSION 3.10)
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
 set_property(DIRECTORY . PROPERTY FOLDER "ANGLE")
 
+# Include minimal WebKit cmake files for standalone build
+include("${CMAKE_CURRENT_SOURCE_DIR}/webkit_patches/cmake/WebKitCommon-minimal.cmake")
+include("${CMAKE_CURRENT_SOURCE_DIR}/webkit_patches/cmake/WebKitCompilerFlags-minimal.cmake")
+include("${CMAKE_CURRENT_SOURCE_DIR}/webkit_patches/cmake/WebKitMacros-minimal.cmake")
+include("${CMAKE_CURRENT_SOURCE_DIR}/webkit_patches/cmake/DetectSSE2.cmake")
+
 if (APPLE)
-   # set(is_mac TRUE)
+    set(is_mac TRUE)
 elseif (WIN32)
     set(is_win TRUE)
     set(angle_enable_d3d9 TRUE)
     set(angle_enable_d3d11 TRUE)
     set(angle_is_winuwp FALSE)
+elseif (ANDROID)
+    set(is_android TRUE)
 elseif (UNIX)
     set(is_linux TRUE)
 endif ()
@@ -57,6 +70,7 @@ set(EGL_LIBRARY_TYPE STATIC)
 # + angle_(renderer) (Backend and OS specific)
 
 set(ANGLE_PRIVATE_INCLUDE_DIRECTORIES
+    "${CMAKE_CURRENT_SOURCE_DIR}/WebKit"
     "${CMAKE_CURRENT_SOURCE_DIR}/include"
     "${CMAKE_CURRENT_SOURCE_DIR}/include/KHR"
     "${CMAKE_CURRENT_SOURCE_DIR}/src"
@@ -86,6 +100,20 @@ set(ANGLE_SOURCES
     src/libANGLE/capture/FrameCapture_mock.cpp
     src/libANGLE/capture/serialize_mock.cpp
 )
+
+
+# Include the correct platform-specific CMake file
+if (APPLE)
+    include(PlatformMac.cmake)
+elseif (WIN32)
+    include(PlatformWin.cmake)
+elseif (UNIX AND NOT APPLE)
+    # Optionally include GTK or WPE for UNIX
+    include(PlatformGTK.cmake)
+    include(PlatformWPE.cmake)
+elseif (DEFINED PLAYSTATION)
+    include(PlatformPlayStation.cmake)
+endif()
 
 if (WIN32)
     # FIXME: DX11 support will not compile if this preprocessor definition is set
@@ -254,3 +282,33 @@ target_link_libraries(ANGLEFramework INTERFACE ANGLE)
 target_include_directories(ANGLEFramework INTERFACE ${ANGLE_FRAMEWORK_HEADERS_DIR})
 
 add_library(ANGLE::ANGLE ALIAS ANGLEFramework)
+
+# Install targets and headers
+if(TARGET ANGLE)
+    install(TARGETS ANGLE
+        EXPORT ANGLETargets
+        ARCHIVE DESTINATION lib
+        LIBRARY DESTINATION lib
+        RUNTIME DESTINATION bin
+    )
+endif()
+if(TARGET GLESv2)
+    install(TARGETS GLESv2
+        EXPORT ANGLETargets
+        ARCHIVE DESTINATION lib
+        LIBRARY DESTINATION lib
+        RUNTIME DESTINATION bin
+    )
+endif()
+if(TARGET EGL)
+    install(TARGETS EGL
+        EXPORT ANGLETargets
+        ARCHIVE DESTINATION lib
+        LIBRARY DESTINATION lib
+        RUNTIME DESTINATION bin
+    )
+endif()
+
+install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/
+    DESTINATION include
+)

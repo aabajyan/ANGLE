@@ -1,0 +1,11 @@
+# Minimal version for standalone ANGLE build
+set(SSE2_SUPPORT_FOUND FALSE)
+macro(CHECK_FOR_SSE2)
+    include(CheckCXXSourceRuns)
+    set(CMAKE_REQUIRED_FLAGS "-msse2")
+    set(CMAKE_REQUIRED_QUIET TRUE)
+    set(SSE2_TEST_SOURCE "#include <emmintrin.h>\nint main() { __m128d a; return 0; }")
+    check_cxx_source_runs("${SSE2_TEST_SOURCE}" SSE2_SUPPORT_FOUND)
+    set(CMAKE_REQUIRED_FLAGS "")
+    set(CMAKE_REQUIRED_QUIET FALSE)
+endmacro()

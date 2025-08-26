@@ -51,6 +51,7 @@ class Surface;
     PROC(MemoryObject)           \
     PROC(Query)                  \
     PROC(Program)                \
+    PROC(ProgramExecutable)      \
     PROC(Sampler)                \
     PROC(Semaphore)              \
     PROC(Texture)                \
@@ -106,7 +107,7 @@ constexpr uint32_t kMaxShaderXFBs = gl::IMPLEMENTATION_MAX_TRANSFORM_FEEDBACK_SE
 // The max size of a buffer that will be allocated in shared memory.
 // NOTE(hqle): This is just a hint. There is no official document on what is the max allowed size
 // for shared memory.
-constexpr size_t kSharedMemBufferMaxBufSizeHint = 128 * 1024;
+constexpr size_t kSharedMemBufferMaxBufSizeHint = 256 * 1024;
 
 constexpr size_t kDefaultAttributeSize = 4 * sizeof(float);
 
@@ -161,8 +162,6 @@ constexpr uint32_t kUBOArgumentBufferBindingIndex = kShadowSamplerCompareModesBi
 
 constexpr uint32_t kStencilMaskAll = 0xff;  // Only 8 bits stencil is supported
 
-static const char *kUnassignedAttributeString = " __unassigned_attribute__";
-
 // This special constant is used to indicate that a particular vertex descriptor's buffer layout
 // index is unused.
 constexpr MTLVertexStepFunction kVertexStepFunctionInvalid =
@@ -173,34 +172,6 @@ constexpr int kEmulatedAlphaValue = 1;
 constexpr size_t kOcclusionQueryResultSize = sizeof(uint64_t);
 
 constexpr gl::Version kMaxSupportedGLVersion = gl::Version(3, 0);
-
-// Work-around the enum is not available on macOS
-#if (TARGET_OS_OSX && (__MAC_OS_X_VERSION_MAX_ALLOWED < 110000)) || TARGET_OS_MACCATALYST
-constexpr MTLBlitOption kBlitOptionRowLinearPVRTC = MTLBlitOptionNone;
-#else
-constexpr MTLBlitOption kBlitOptionRowLinearPVRTC          = MTLBlitOptionRowLinearPVRTC;
-#endif
-
-#if defined(__MAC_10_14) && (TARGET_OS_OSX || TARGET_OS_MACCATALYST)
-constexpr MTLBarrierScope kBarrierScopeRenderTargets = MTLBarrierScopeRenderTargets;
-#else
-constexpr MTLBarrierScope kBarrierScopeRenderTargets       = MTLBarrierScope(0);
-#endif
-
-#if defined(__IPHONE_13_0) || defined(__MAC_10_15)
-#    define ANGLE_MTL_SWIZZLE_AVAILABLE 1
-using TextureSwizzleChannels                   = MTLTextureSwizzleChannels;
-using BarrierScope                             = MTLBarrierScope;
-using RenderStages                             = MTLRenderStages;
-constexpr MTLRenderStages kRenderStageVertex   = MTLRenderStageVertex;
-constexpr MTLRenderStages kRenderStageFragment = MTLRenderStageFragment;
-#else
-#    define ANGLE_MTL_SWIZZLE_AVAILABLE 0
-using TextureSwizzleChannels                               = int;
-using RenderStages                                         = int;
-constexpr RenderStages kRenderStageVertex                  = 1;
-constexpr RenderStages kRenderStageFragment                = 2;
-#endif
 
 enum class PixelType
 {
@@ -369,6 +340,8 @@ class AutoObjCPtr : public WrappedObject<T>
 
     bool operator!=(T rhs) const { return this->get() != rhs; }
 
+    operator T() const { return this->get(); }
+
     using ParentType::retainAssign;
 
     template <typename U>
@@ -401,14 +374,7 @@ inline AutoObjCObj<U> adoptObjCObj(U *NS_RELEASES_ARGUMENT src)
 #endif
 }
 
-// NOTE: SharedEvent is only declared on iOS 12.0+ or mac 10.14+
-#if defined(__IPHONE_12_0) || defined(__MAC_10_14)
-#    define ANGLE_MTL_EVENT_AVAILABLE 1
-using SharedEventRef = AutoObjCPtr<id<MTLSharedEvent>>;
-#else
-#    define ANGLE_MTL_EVENT_AVAILABLE 0
-using SharedEventRef = AutoObjCObj<NSObject>;
-#endif
+using RasterizationRateMapRef = AutoObjCPtr<id<MTLRasterizationRateMap>>;
 
 // The native image index used by Metal back-end,  the image index uses native mipmap level instead
 // of "virtual" level modified by OpenGL's base level.
@@ -530,6 +496,7 @@ class ClearColorValue
 };
 
 class CommandQueue;
+
 class ErrorHandler
 {
   public:
@@ -541,11 +508,17 @@ class ErrorHandler
                              const char *function,
                              unsigned int line) = 0;
 
-    virtual void handleError(NSError *error,
-                             const char *message,
-                             const char *file,
-                             const char *function,
-                             unsigned int line) = 0;
+    void handleNSError(NSError *error, const char *file, const char *function, unsigned int line)
+    {
+        std::string message;
+        {
+            std::stringstream s;
+            s << "Internal error. Metal error: "
+              << (error != nil ? error.localizedDescription.UTF8String : "nil error");
+            message = s.str();
+        }
+        handleError(GL_INVALID_OPERATION, message.c_str(), file, function, line);
+    }
 };
 
 class Context : public ErrorHandler
@@ -560,28 +533,17 @@ class Context : public ErrorHandler
     DisplayMtl *mDisplay;
 };
 
-std::string FormatMetalErrorMessage(GLenum errorCode);
-std::string FormatMetalErrorMessage(NSError *error);
-
-#define ANGLE_MTL_HANDLE_ERROR(context, message, error) \
-    context->handleError(error, message, __FILE__, ANGLE_FUNCTION, __LINE__)
-
-#define ANGLE_MTL_CHECK(context, test, error)                                                  \
-    do                                                                                         \
-    {                                                                                          \
-        if (ANGLE_UNLIKELY(!(test)))                                                           \
-        {                                                                                      \
-            context->handleError(error, mtl::FormatMetalErrorMessage(error).c_str(), __FILE__, \
-                                 ANGLE_FUNCTION, __LINE__);                                    \
-            return angle::Result::Stop;                                                        \
-        }                                                                                      \
+#define ANGLE_MTL_CHECK(context, result, nserror)                                   \
+    do                                                                              \
+    {                                                                               \
+        auto &localResult = (result);                                               \
+        auto &localError  = (nserror);                                              \
+        if (ANGLE_UNLIKELY(!localResult || localError))                             \
+        {                                                                           \
+            context->handleNSError(localError, __FILE__, ANGLE_FUNCTION, __LINE__); \
+            return angle::Result::Stop;                                             \
+        }                                                                           \
     } while (0)
-
-#define ANGLE_MTL_TRY(context, test) ANGLE_MTL_CHECK(context, test, GL_INVALID_OPERATION)
-
-#define ANGLE_MTL_UNREACHABLE(context) \
-    UNREACHABLE();                     \
-    ANGLE_MTL_TRY(context, false)
 
 }  // namespace mtl
 }  // namespace rx

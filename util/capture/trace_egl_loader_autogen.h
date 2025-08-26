@@ -72,9 +72,14 @@
 #define eglPresentationTimeANDROID t_eglPresentationTimeANDROID
 #define eglCreateDeviceANGLE t_eglCreateDeviceANGLE
 #define eglReleaseDeviceANGLE t_eglReleaseDeviceANGLE
+#define eglLockVulkanQueueANGLE t_eglLockVulkanQueueANGLE
+#define eglUnlockVulkanQueueANGLE t_eglUnlockVulkanQueueANGLE
+#define eglAcquireExternalContextANGLE t_eglAcquireExternalContextANGLE
+#define eglReleaseExternalContextANGLE t_eglReleaseExternalContextANGLE
 #define eglQueryDisplayAttribANGLE t_eglQueryDisplayAttribANGLE
 #define eglQueryStringiANGLE t_eglQueryStringiANGLE
 #define eglCopyMetalSharedEventANGLE t_eglCopyMetalSharedEventANGLE
+#define eglSetValidationEnabledANGLE t_eglSetValidationEnabledANGLE
 #define eglForceGPUSwitchANGLE t_eglForceGPUSwitchANGLE
 #define eglHandleGPUSwitchANGLE t_eglHandleGPUSwitchANGLE
 #define eglReacquireHighPowerGPUANGLE t_eglReacquireHighPowerGPUANGLE
@@ -100,6 +105,7 @@
 #define eglCreatePlatformPixmapSurfaceEXT t_eglCreatePlatformPixmapSurfaceEXT
 #define eglCreatePlatformWindowSurfaceEXT t_eglCreatePlatformWindowSurfaceEXT
 #define eglGetPlatformDisplayEXT t_eglGetPlatformDisplayEXT
+#define eglQuerySupportedCompressionRatesEXT t_eglQuerySupportedCompressionRatesEXT
 #define eglDebugMessageControlKHR t_eglDebugMessageControlKHR
 #define eglLabelObjectKHR t_eglLabelObjectKHR
 #define eglQueryDebugKHR t_eglQueryDebugKHR
@@ -194,9 +200,16 @@ ANGLE_TRACE_LOADER_EXPORT extern PFNEGLDUPNATIVEFENCEFDANDROIDPROC t_eglDupNativ
 ANGLE_TRACE_LOADER_EXPORT extern PFNEGLPRESENTATIONTIMEANDROIDPROC t_eglPresentationTimeANDROID;
 ANGLE_TRACE_LOADER_EXPORT extern PFNEGLCREATEDEVICEANGLEPROC t_eglCreateDeviceANGLE;
 ANGLE_TRACE_LOADER_EXPORT extern PFNEGLRELEASEDEVICEANGLEPROC t_eglReleaseDeviceANGLE;
+ANGLE_TRACE_LOADER_EXPORT extern PFNEGLLOCKVULKANQUEUEANGLEPROC t_eglLockVulkanQueueANGLE;
+ANGLE_TRACE_LOADER_EXPORT extern PFNEGLUNLOCKVULKANQUEUEANGLEPROC t_eglUnlockVulkanQueueANGLE;
+ANGLE_TRACE_LOADER_EXPORT extern PFNEGLACQUIREEXTERNALCONTEXTANGLEPROC
+    t_eglAcquireExternalContextANGLE;
+ANGLE_TRACE_LOADER_EXPORT extern PFNEGLRELEASEEXTERNALCONTEXTANGLEPROC
+    t_eglReleaseExternalContextANGLE;
 ANGLE_TRACE_LOADER_EXPORT extern PFNEGLQUERYDISPLAYATTRIBANGLEPROC t_eglQueryDisplayAttribANGLE;
 ANGLE_TRACE_LOADER_EXPORT extern PFNEGLQUERYSTRINGIANGLEPROC t_eglQueryStringiANGLE;
 ANGLE_TRACE_LOADER_EXPORT extern PFNEGLCOPYMETALSHAREDEVENTANGLEPROC t_eglCopyMetalSharedEventANGLE;
+ANGLE_TRACE_LOADER_EXPORT extern PFNEGLSETVALIDATIONENABLEDANGLEPROC t_eglSetValidationEnabledANGLE;
 ANGLE_TRACE_LOADER_EXPORT extern PFNEGLFORCEGPUSWITCHANGLEPROC t_eglForceGPUSwitchANGLE;
 ANGLE_TRACE_LOADER_EXPORT extern PFNEGLHANDLEGPUSWITCHANGLEPROC t_eglHandleGPUSwitchANGLE;
 ANGLE_TRACE_LOADER_EXPORT extern PFNEGLREACQUIREHIGHPOWERGPUANGLEPROC
@@ -229,6 +242,8 @@ ANGLE_TRACE_LOADER_EXPORT extern PFNEGLCREATEPLATFORMPIXMAPSURFACEEXTPROC
 ANGLE_TRACE_LOADER_EXPORT extern PFNEGLCREATEPLATFORMWINDOWSURFACEEXTPROC
     t_eglCreatePlatformWindowSurfaceEXT;
 ANGLE_TRACE_LOADER_EXPORT extern PFNEGLGETPLATFORMDISPLAYEXTPROC t_eglGetPlatformDisplayEXT;
+ANGLE_TRACE_LOADER_EXPORT extern PFNEGLQUERYSUPPORTEDCOMPRESSIONRATESEXTPROC
+    t_eglQuerySupportedCompressionRatesEXT;
 ANGLE_TRACE_LOADER_EXPORT extern PFNEGLDEBUGMESSAGECONTROLKHRPROC t_eglDebugMessageControlKHR;
 ANGLE_TRACE_LOADER_EXPORT extern PFNEGLLABELOBJECTKHRPROC t_eglLabelObjectKHR;
 ANGLE_TRACE_LOADER_EXPORT extern PFNEGLQUERYDEBUGKHRPROC t_eglQueryDebugKHR;
@@ -263,7 +278,7 @@ typedef GenericProc(KHRONOS_APIENTRY *LoadProc)(const char *);
 ANGLE_TRACE_LOADER_EXPORT void LoadTraceEGL(LoadProc loadProc);
 
 #if defined(__cplusplus)
-}  // extern "C"
+}       // extern "C"
 #endif  // defined(__cplusplus)
 
 #endif  // ANGLE_TRACES_UTIL_EGL_LOADER_AUTOGEN_H_

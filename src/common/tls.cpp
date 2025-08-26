@@ -20,7 +20,6 @@
 #    include <wrl/async.h>
 #    include <wrl/client.h>
 
-using namespace std;
 using namespace Windows::Foundation;
 using namespace ABI::Windows::System::Threading;
 
@@ -33,6 +32,9 @@ static DWORD nextTlsIndex = 0;
 static vector<DWORD> freeTlsIndices;
 
 #endif
+
+namespace angle
+{
 
 TLSIndex CreateTLSIndex(PthreadKeyDestructor destructor)
 {
@@ -154,3 +156,5 @@ void *GetTLSValue(TLSIndex index)
     return pthread_getspecific(index);
 #endif
 }
+
+}  // namespace angle

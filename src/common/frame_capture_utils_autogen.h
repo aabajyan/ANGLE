@@ -74,19 +74,16 @@ enum class ParamType
     TFramebufferIDPointer,
     TGLDEBUGPROC,
     TGLDEBUGPROCKHR,
+    TGLGETBLOBPROCANGLE,
+    TGLSETBLOBPROCANGLE,
+    TGLMTLRasterizationRateMapANGLE,
     TGLbitfield,
     TGLboolean,
-    TGLbooleanConstPointer,
     TGLbooleanPointer,
-    TGLbyte,
-    TGLbyteConstPointer,
     TGLcharConstPointer,
     TGLcharConstPointerPointer,
     TGLcharPointer,
     TGLclampx,
-    TGLdouble,
-    TGLdoubleConstPointer,
-    TGLdoublePointer,
     TGLeglClientBufferEXT,
     TGLenum,
     TGLenumConstPointer,
@@ -103,14 +100,12 @@ enum class ParamType
     TGLintConstPointer,
     TGLintPointer,
     TGLintptr,
-    TGLintptrConstPointer,
     TGLshort,
     TGLshortConstPointer,
     TGLsizei,
     TGLsizeiConstPointer,
     TGLsizeiPointer,
     TGLsizeiptr,
-    TGLsizeiptrConstPointer,
     TGLsync,
     TGLubyte,
     TGLubyteConstPointer,
@@ -121,11 +116,6 @@ enum class ParamType
     TGLuint64Pointer,
     TGLuintConstPointer,
     TGLuintPointer,
-    TGLushort,
-    TGLushortConstPointer,
-    TGLushortPointer,
-    TGLvoidConstPointer,
-    TGLvoidConstPointerPointer,
     TGraphicsResetStatus,
     THandleType,
     TImageID,
@@ -138,6 +128,7 @@ enum class ParamType
     TMemoryObjectIDPointer,
     TObjectType,
     TPointParameter,
+    TPolygonMode,
     TPrimitiveMode,
     TProgramPipelineID,
     TProgramPipelineIDConstPointer,
@@ -192,7 +183,7 @@ enum class ParamType
     TvoidPointerPointer,
 };
 
-constexpr uint32_t kParamTypeCount = 173;
+constexpr uint32_t kParamTypeCount = 164;
 
 union ParamValue
 {
@@ -253,19 +244,16 @@ union ParamValue
     gl::FramebufferID *FramebufferIDPointerVal;
     GLDEBUGPROC GLDEBUGPROCVal;
     GLDEBUGPROCKHR GLDEBUGPROCKHRVal;
+    GLGETBLOBPROCANGLE GLGETBLOBPROCANGLEVal;
+    GLSETBLOBPROCANGLE GLSETBLOBPROCANGLEVal;
+    GLMTLRasterizationRateMapANGLE GLMTLRasterizationRateMapANGLEVal;
     GLbitfield GLbitfieldVal;
     GLboolean GLbooleanVal;
-    const GLboolean *GLbooleanConstPointerVal;
     GLboolean *GLbooleanPointerVal;
-    GLbyte GLbyteVal;
-    const GLbyte *GLbyteConstPointerVal;
     const GLchar *GLcharConstPointerVal;
     const GLchar *const *GLcharConstPointerPointerVal;
     GLchar *GLcharPointerVal;
     GLclampx GLclampxVal;
-    GLdouble GLdoubleVal;
-    const GLdouble *GLdoubleConstPointerVal;
-    GLdouble *GLdoublePointerVal;
     GLeglClientBufferEXT GLeglClientBufferEXTVal;
     GLenum GLenumVal;
     const GLenum *GLenumConstPointerVal;
@@ -282,14 +270,12 @@ union ParamValue
     const GLint *GLintConstPointerVal;
     GLint *GLintPointerVal;
     GLintptr GLintptrVal;
-    const GLintptr *GLintptrConstPointerVal;
     GLshort GLshortVal;
     const GLshort *GLshortConstPointerVal;
     GLsizei GLsizeiVal;
     const GLsizei *GLsizeiConstPointerVal;
     GLsizei *GLsizeiPointerVal;
     GLsizeiptr GLsizeiptrVal;
-    const GLsizeiptr *GLsizeiptrConstPointerVal;
     GLsync GLsyncVal;
     GLubyte GLubyteVal;
     const GLubyte *GLubyteConstPointerVal;
@@ -300,11 +286,6 @@ union ParamValue
     GLuint64 *GLuint64PointerVal;
     const GLuint *GLuintConstPointerVal;
     GLuint *GLuintPointerVal;
-    GLushort GLushortVal;
-    const GLushort *GLushortConstPointerVal;
-    GLushort *GLushortPointerVal;
-    const GLvoid *GLvoidConstPointerVal;
-    const GLvoid *const *GLvoidConstPointerPointerVal;
     gl::GraphicsResetStatus GraphicsResetStatusVal;
     gl::HandleType HandleTypeVal;
     egl::ImageID ImageIDVal;
@@ -317,6 +298,7 @@ union ParamValue
     gl::MemoryObjectID *MemoryObjectIDPointerVal;
     egl::ObjectType ObjectTypeVal;
     gl::PointParameter PointParameterVal;
+    gl::PolygonMode PolygonModeVal;
     gl::PrimitiveMode PrimitiveModeVal;
     gl::ProgramPipelineID ProgramPipelineIDVal;
     const gl::ProgramPipelineID *ProgramPipelineIDConstPointerVal;
@@ -748,6 +730,28 @@ inline GLDEBUGPROCKHR GetParamVal<ParamType::TGLDEBUGPROCKHR, GLDEBUGPROCKHR>(
 }
 
 template <>
+inline GLGETBLOBPROCANGLE GetParamVal<ParamType::TGLGETBLOBPROCANGLE, GLGETBLOBPROCANGLE>(
+    const ParamValue &value)
+{
+    return value.GLGETBLOBPROCANGLEVal;
+}
+
+template <>
+inline GLSETBLOBPROCANGLE GetParamVal<ParamType::TGLSETBLOBPROCANGLE, GLSETBLOBPROCANGLE>(
+    const ParamValue &value)
+{
+    return value.GLSETBLOBPROCANGLEVal;
+}
+
+template <>
+inline GLMTLRasterizationRateMapANGLE
+GetParamVal<ParamType::TGLMTLRasterizationRateMapANGLE, GLMTLRasterizationRateMapANGLE>(
+    const ParamValue &value)
+{
+    return value.GLMTLRasterizationRateMapANGLEVal;
+}
+
+template <>
 inline GLbitfield GetParamVal<ParamType::TGLbitfield, GLbitfield>(const ParamValue &value)
 {
     return value.GLbitfieldVal;
@@ -760,29 +764,9 @@ inline GLboolean GetParamVal<ParamType::TGLboolean, GLboolean>(const ParamValue 
 }
 
 template <>
-inline const GLboolean *GetParamVal<ParamType::TGLbooleanConstPointer, const GLboolean *>(
-    const ParamValue &value)
-{
-    return value.GLbooleanConstPointerVal;
-}
-
-template <>
 inline GLboolean *GetParamVal<ParamType::TGLbooleanPointer, GLboolean *>(const ParamValue &value)
 {
     return value.GLbooleanPointerVal;
-}
-
-template <>
-inline GLbyte GetParamVal<ParamType::TGLbyte, GLbyte>(const ParamValue &value)
-{
-    return value.GLbyteVal;
-}
-
-template <>
-inline const GLbyte *GetParamVal<ParamType::TGLbyteConstPointer, const GLbyte *>(
-    const ParamValue &value)
-{
-    return value.GLbyteConstPointerVal;
 }
 
 template <>
@@ -809,25 +793,6 @@ template <>
 inline GLclampx GetParamVal<ParamType::TGLclampx, GLclampx>(const ParamValue &value)
 {
     return value.GLclampxVal;
-}
-
-template <>
-inline GLdouble GetParamVal<ParamType::TGLdouble, GLdouble>(const ParamValue &value)
-{
-    return value.GLdoubleVal;
-}
-
-template <>
-inline const GLdouble *GetParamVal<ParamType::TGLdoubleConstPointer, const GLdouble *>(
-    const ParamValue &value)
-{
-    return value.GLdoubleConstPointerVal;
-}
-
-template <>
-inline GLdouble *GetParamVal<ParamType::TGLdoublePointer, GLdouble *>(const ParamValue &value)
-{
-    return value.GLdoublePointerVal;
 }
 
 template <>
@@ -932,13 +897,6 @@ inline GLintptr GetParamVal<ParamType::TGLintptr, GLintptr>(const ParamValue &va
 }
 
 template <>
-inline const GLintptr *GetParamVal<ParamType::TGLintptrConstPointer, const GLintptr *>(
-    const ParamValue &value)
-{
-    return value.GLintptrConstPointerVal;
-}
-
-template <>
 inline GLshort GetParamVal<ParamType::TGLshort, GLshort>(const ParamValue &value)
 {
     return value.GLshortVal;
@@ -974,13 +932,6 @@ template <>
 inline GLsizeiptr GetParamVal<ParamType::TGLsizeiptr, GLsizeiptr>(const ParamValue &value)
 {
     return value.GLsizeiptrVal;
-}
-
-template <>
-inline const GLsizeiptr *GetParamVal<ParamType::TGLsizeiptrConstPointer, const GLsizeiptr *>(
-    const ParamValue &value)
-{
-    return value.GLsizeiptrConstPointerVal;
 }
 
 template <>
@@ -1044,39 +995,6 @@ template <>
 inline GLuint *GetParamVal<ParamType::TGLuintPointer, GLuint *>(const ParamValue &value)
 {
     return value.GLuintPointerVal;
-}
-
-template <>
-inline GLushort GetParamVal<ParamType::TGLushort, GLushort>(const ParamValue &value)
-{
-    return value.GLushortVal;
-}
-
-template <>
-inline const GLushort *GetParamVal<ParamType::TGLushortConstPointer, const GLushort *>(
-    const ParamValue &value)
-{
-    return value.GLushortConstPointerVal;
-}
-
-template <>
-inline GLushort *GetParamVal<ParamType::TGLushortPointer, GLushort *>(const ParamValue &value)
-{
-    return value.GLushortPointerVal;
-}
-
-template <>
-inline const GLvoid *GetParamVal<ParamType::TGLvoidConstPointer, const GLvoid *>(
-    const ParamValue &value)
-{
-    return value.GLvoidConstPointerVal;
-}
-
-template <>
-inline const GLvoid *const *
-GetParamVal<ParamType::TGLvoidConstPointerPointer, const GLvoid *const *>(const ParamValue &value)
-{
-    return value.GLvoidConstPointerPointerVal;
 }
 
 template <>
@@ -1157,6 +1075,13 @@ inline gl::PointParameter GetParamVal<ParamType::TPointParameter, gl::PointParam
     const ParamValue &value)
 {
     return value.PointParameterVal;
+}
+
+template <>
+inline gl::PolygonMode GetParamVal<ParamType::TPolygonMode, gl::PolygonMode>(
+    const ParamValue &value)
+{
+    return value.PolygonModeVal;
 }
 
 template <>
@@ -1638,18 +1563,18 @@ T AccessParamValue(ParamType paramType, const ParamValue &value)
             return GetParamVal<ParamType::TGLDEBUGPROC, T>(value);
         case ParamType::TGLDEBUGPROCKHR:
             return GetParamVal<ParamType::TGLDEBUGPROCKHR, T>(value);
+        case ParamType::TGLGETBLOBPROCANGLE:
+            return GetParamVal<ParamType::TGLGETBLOBPROCANGLE, T>(value);
+        case ParamType::TGLSETBLOBPROCANGLE:
+            return GetParamVal<ParamType::TGLSETBLOBPROCANGLE, T>(value);
+        case ParamType::TGLMTLRasterizationRateMapANGLE:
+            return GetParamVal<ParamType::TGLMTLRasterizationRateMapANGLE, T>(value);
         case ParamType::TGLbitfield:
             return GetParamVal<ParamType::TGLbitfield, T>(value);
         case ParamType::TGLboolean:
             return GetParamVal<ParamType::TGLboolean, T>(value);
-        case ParamType::TGLbooleanConstPointer:
-            return GetParamVal<ParamType::TGLbooleanConstPointer, T>(value);
         case ParamType::TGLbooleanPointer:
             return GetParamVal<ParamType::TGLbooleanPointer, T>(value);
-        case ParamType::TGLbyte:
-            return GetParamVal<ParamType::TGLbyte, T>(value);
-        case ParamType::TGLbyteConstPointer:
-            return GetParamVal<ParamType::TGLbyteConstPointer, T>(value);
         case ParamType::TGLcharConstPointer:
             return GetParamVal<ParamType::TGLcharConstPointer, T>(value);
         case ParamType::TGLcharConstPointerPointer:
@@ -1658,12 +1583,6 @@ T AccessParamValue(ParamType paramType, const ParamValue &value)
             return GetParamVal<ParamType::TGLcharPointer, T>(value);
         case ParamType::TGLclampx:
             return GetParamVal<ParamType::TGLclampx, T>(value);
-        case ParamType::TGLdouble:
-            return GetParamVal<ParamType::TGLdouble, T>(value);
-        case ParamType::TGLdoubleConstPointer:
-            return GetParamVal<ParamType::TGLdoubleConstPointer, T>(value);
-        case ParamType::TGLdoublePointer:
-            return GetParamVal<ParamType::TGLdoublePointer, T>(value);
         case ParamType::TGLeglClientBufferEXT:
             return GetParamVal<ParamType::TGLeglClientBufferEXT, T>(value);
         case ParamType::TGLenum:
@@ -1696,8 +1615,6 @@ T AccessParamValue(ParamType paramType, const ParamValue &value)
             return GetParamVal<ParamType::TGLintPointer, T>(value);
         case ParamType::TGLintptr:
             return GetParamVal<ParamType::TGLintptr, T>(value);
-        case ParamType::TGLintptrConstPointer:
-            return GetParamVal<ParamType::TGLintptrConstPointer, T>(value);
         case ParamType::TGLshort:
             return GetParamVal<ParamType::TGLshort, T>(value);
         case ParamType::TGLshortConstPointer:
@@ -1710,8 +1627,6 @@ T AccessParamValue(ParamType paramType, const ParamValue &value)
             return GetParamVal<ParamType::TGLsizeiPointer, T>(value);
         case ParamType::TGLsizeiptr:
             return GetParamVal<ParamType::TGLsizeiptr, T>(value);
-        case ParamType::TGLsizeiptrConstPointer:
-            return GetParamVal<ParamType::TGLsizeiptrConstPointer, T>(value);
         case ParamType::TGLsync:
             return GetParamVal<ParamType::TGLsync, T>(value);
         case ParamType::TGLubyte:
@@ -1732,16 +1647,6 @@ T AccessParamValue(ParamType paramType, const ParamValue &value)
             return GetParamVal<ParamType::TGLuintConstPointer, T>(value);
         case ParamType::TGLuintPointer:
             return GetParamVal<ParamType::TGLuintPointer, T>(value);
-        case ParamType::TGLushort:
-            return GetParamVal<ParamType::TGLushort, T>(value);
-        case ParamType::TGLushortConstPointer:
-            return GetParamVal<ParamType::TGLushortConstPointer, T>(value);
-        case ParamType::TGLushortPointer:
-            return GetParamVal<ParamType::TGLushortPointer, T>(value);
-        case ParamType::TGLvoidConstPointer:
-            return GetParamVal<ParamType::TGLvoidConstPointer, T>(value);
-        case ParamType::TGLvoidConstPointerPointer:
-            return GetParamVal<ParamType::TGLvoidConstPointerPointer, T>(value);
         case ParamType::TGraphicsResetStatus:
             return GetParamVal<ParamType::TGraphicsResetStatus, T>(value);
         case ParamType::THandleType:
@@ -1766,6 +1671,8 @@ T AccessParamValue(ParamType paramType, const ParamValue &value)
             return GetParamVal<ParamType::TObjectType, T>(value);
         case ParamType::TPointParameter:
             return GetParamVal<ParamType::TPointParameter, T>(value);
+        case ParamType::TPolygonMode:
+            return GetParamVal<ParamType::TPolygonMode, T>(value);
         case ParamType::TPrimitiveMode:
             return GetParamVal<ParamType::TPrimitiveMode, T>(value);
         case ParamType::TProgramPipelineID:
@@ -2239,6 +2146,28 @@ inline void SetParamVal<ParamType::TGLDEBUGPROCKHR>(GLDEBUGPROCKHR valueIn, Para
 }
 
 template <>
+inline void SetParamVal<ParamType::TGLGETBLOBPROCANGLE>(GLGETBLOBPROCANGLE valueIn,
+                                                        ParamValue *valueOut)
+{
+    valueOut->GLGETBLOBPROCANGLEVal = valueIn;
+}
+
+template <>
+inline void SetParamVal<ParamType::TGLSETBLOBPROCANGLE>(GLSETBLOBPROCANGLE valueIn,
+                                                        ParamValue *valueOut)
+{
+    valueOut->GLSETBLOBPROCANGLEVal = valueIn;
+}
+
+template <>
+inline void SetParamVal<ParamType::TGLMTLRasterizationRateMapANGLE>(
+    GLMTLRasterizationRateMapANGLE valueIn,
+    ParamValue *valueOut)
+{
+    valueOut->GLMTLRasterizationRateMapANGLEVal = valueIn;
+}
+
+template <>
 inline void SetParamVal<ParamType::TGLbitfield>(GLbitfield valueIn, ParamValue *valueOut)
 {
     valueOut->GLbitfieldVal = valueIn;
@@ -2251,28 +2180,9 @@ inline void SetParamVal<ParamType::TGLboolean>(GLboolean valueIn, ParamValue *va
 }
 
 template <>
-inline void SetParamVal<ParamType::TGLbooleanConstPointer>(const GLboolean *valueIn,
-                                                           ParamValue *valueOut)
-{
-    valueOut->GLbooleanConstPointerVal = valueIn;
-}
-
-template <>
 inline void SetParamVal<ParamType::TGLbooleanPointer>(GLboolean *valueIn, ParamValue *valueOut)
 {
     valueOut->GLbooleanPointerVal = valueIn;
-}
-
-template <>
-inline void SetParamVal<ParamType::TGLbyte>(GLbyte valueIn, ParamValue *valueOut)
-{
-    valueOut->GLbyteVal = valueIn;
-}
-
-template <>
-inline void SetParamVal<ParamType::TGLbyteConstPointer>(const GLbyte *valueIn, ParamValue *valueOut)
-{
-    valueOut->GLbyteConstPointerVal = valueIn;
 }
 
 template <>
@@ -2298,25 +2208,6 @@ template <>
 inline void SetParamVal<ParamType::TGLclampx>(GLclampx valueIn, ParamValue *valueOut)
 {
     valueOut->GLclampxVal = valueIn;
-}
-
-template <>
-inline void SetParamVal<ParamType::TGLdouble>(GLdouble valueIn, ParamValue *valueOut)
-{
-    valueOut->GLdoubleVal = valueIn;
-}
-
-template <>
-inline void SetParamVal<ParamType::TGLdoubleConstPointer>(const GLdouble *valueIn,
-                                                          ParamValue *valueOut)
-{
-    valueOut->GLdoubleConstPointerVal = valueIn;
-}
-
-template <>
-inline void SetParamVal<ParamType::TGLdoublePointer>(GLdouble *valueIn, ParamValue *valueOut)
-{
-    valueOut->GLdoublePointerVal = valueIn;
 }
 
 template <>
@@ -2419,13 +2310,6 @@ inline void SetParamVal<ParamType::TGLintptr>(GLintptr valueIn, ParamValue *valu
 }
 
 template <>
-inline void SetParamVal<ParamType::TGLintptrConstPointer>(const GLintptr *valueIn,
-                                                          ParamValue *valueOut)
-{
-    valueOut->GLintptrConstPointerVal = valueIn;
-}
-
-template <>
 inline void SetParamVal<ParamType::TGLshort>(GLshort valueIn, ParamValue *valueOut)
 {
     valueOut->GLshortVal = valueIn;
@@ -2461,13 +2345,6 @@ template <>
 inline void SetParamVal<ParamType::TGLsizeiptr>(GLsizeiptr valueIn, ParamValue *valueOut)
 {
     valueOut->GLsizeiptrVal = valueIn;
-}
-
-template <>
-inline void SetParamVal<ParamType::TGLsizeiptrConstPointer>(const GLsizeiptr *valueIn,
-                                                            ParamValue *valueOut)
-{
-    valueOut->GLsizeiptrConstPointerVal = valueIn;
 }
 
 template <>
@@ -2530,38 +2407,6 @@ template <>
 inline void SetParamVal<ParamType::TGLuintPointer>(GLuint *valueIn, ParamValue *valueOut)
 {
     valueOut->GLuintPointerVal = valueIn;
-}
-
-template <>
-inline void SetParamVal<ParamType::TGLushort>(GLushort valueIn, ParamValue *valueOut)
-{
-    valueOut->GLushortVal = valueIn;
-}
-
-template <>
-inline void SetParamVal<ParamType::TGLushortConstPointer>(const GLushort *valueIn,
-                                                          ParamValue *valueOut)
-{
-    valueOut->GLushortConstPointerVal = valueIn;
-}
-
-template <>
-inline void SetParamVal<ParamType::TGLushortPointer>(GLushort *valueIn, ParamValue *valueOut)
-{
-    valueOut->GLushortPointerVal = valueIn;
-}
-
-template <>
-inline void SetParamVal<ParamType::TGLvoidConstPointer>(const GLvoid *valueIn, ParamValue *valueOut)
-{
-    valueOut->GLvoidConstPointerVal = valueIn;
-}
-
-template <>
-inline void SetParamVal<ParamType::TGLvoidConstPointerPointer>(const GLvoid *const *valueIn,
-                                                               ParamValue *valueOut)
-{
-    valueOut->GLvoidConstPointerPointerVal = valueIn;
 }
 
 template <>
@@ -2642,6 +2487,12 @@ inline void SetParamVal<ParamType::TPointParameter>(gl::PointParameter valueIn,
                                                     ParamValue *valueOut)
 {
     valueOut->PointParameterVal = valueIn;
+}
+
+template <>
+inline void SetParamVal<ParamType::TPolygonMode>(gl::PolygonMode valueIn, ParamValue *valueOut)
+{
+    valueOut->PolygonModeVal = valueIn;
 }
 
 template <>
@@ -3167,23 +3018,23 @@ void InitParamValue(ParamType paramType, T valueIn, ParamValue *valueOut)
         case ParamType::TGLDEBUGPROCKHR:
             SetParamVal<ParamType::TGLDEBUGPROCKHR>(valueIn, valueOut);
             break;
+        case ParamType::TGLGETBLOBPROCANGLE:
+            SetParamVal<ParamType::TGLGETBLOBPROCANGLE>(valueIn, valueOut);
+            break;
+        case ParamType::TGLSETBLOBPROCANGLE:
+            SetParamVal<ParamType::TGLSETBLOBPROCANGLE>(valueIn, valueOut);
+            break;
+        case ParamType::TGLMTLRasterizationRateMapANGLE:
+            SetParamVal<ParamType::TGLMTLRasterizationRateMapANGLE>(valueIn, valueOut);
+            break;
         case ParamType::TGLbitfield:
             SetParamVal<ParamType::TGLbitfield>(valueIn, valueOut);
             break;
         case ParamType::TGLboolean:
             SetParamVal<ParamType::TGLboolean>(valueIn, valueOut);
             break;
-        case ParamType::TGLbooleanConstPointer:
-            SetParamVal<ParamType::TGLbooleanConstPointer>(valueIn, valueOut);
-            break;
         case ParamType::TGLbooleanPointer:
             SetParamVal<ParamType::TGLbooleanPointer>(valueIn, valueOut);
-            break;
-        case ParamType::TGLbyte:
-            SetParamVal<ParamType::TGLbyte>(valueIn, valueOut);
-            break;
-        case ParamType::TGLbyteConstPointer:
-            SetParamVal<ParamType::TGLbyteConstPointer>(valueIn, valueOut);
             break;
         case ParamType::TGLcharConstPointer:
             SetParamVal<ParamType::TGLcharConstPointer>(valueIn, valueOut);
@@ -3196,15 +3047,6 @@ void InitParamValue(ParamType paramType, T valueIn, ParamValue *valueOut)
             break;
         case ParamType::TGLclampx:
             SetParamVal<ParamType::TGLclampx>(valueIn, valueOut);
-            break;
-        case ParamType::TGLdouble:
-            SetParamVal<ParamType::TGLdouble>(valueIn, valueOut);
-            break;
-        case ParamType::TGLdoubleConstPointer:
-            SetParamVal<ParamType::TGLdoubleConstPointer>(valueIn, valueOut);
-            break;
-        case ParamType::TGLdoublePointer:
-            SetParamVal<ParamType::TGLdoublePointer>(valueIn, valueOut);
             break;
         case ParamType::TGLeglClientBufferEXT:
             SetParamVal<ParamType::TGLeglClientBufferEXT>(valueIn, valueOut);
@@ -3254,9 +3096,6 @@ void InitParamValue(ParamType paramType, T valueIn, ParamValue *valueOut)
         case ParamType::TGLintptr:
             SetParamVal<ParamType::TGLintptr>(valueIn, valueOut);
             break;
-        case ParamType::TGLintptrConstPointer:
-            SetParamVal<ParamType::TGLintptrConstPointer>(valueIn, valueOut);
-            break;
         case ParamType::TGLshort:
             SetParamVal<ParamType::TGLshort>(valueIn, valueOut);
             break;
@@ -3274,9 +3113,6 @@ void InitParamValue(ParamType paramType, T valueIn, ParamValue *valueOut)
             break;
         case ParamType::TGLsizeiptr:
             SetParamVal<ParamType::TGLsizeiptr>(valueIn, valueOut);
-            break;
-        case ParamType::TGLsizeiptrConstPointer:
-            SetParamVal<ParamType::TGLsizeiptrConstPointer>(valueIn, valueOut);
             break;
         case ParamType::TGLsync:
             SetParamVal<ParamType::TGLsync>(valueIn, valueOut);
@@ -3307,21 +3143,6 @@ void InitParamValue(ParamType paramType, T valueIn, ParamValue *valueOut)
             break;
         case ParamType::TGLuintPointer:
             SetParamVal<ParamType::TGLuintPointer>(valueIn, valueOut);
-            break;
-        case ParamType::TGLushort:
-            SetParamVal<ParamType::TGLushort>(valueIn, valueOut);
-            break;
-        case ParamType::TGLushortConstPointer:
-            SetParamVal<ParamType::TGLushortConstPointer>(valueIn, valueOut);
-            break;
-        case ParamType::TGLushortPointer:
-            SetParamVal<ParamType::TGLushortPointer>(valueIn, valueOut);
-            break;
-        case ParamType::TGLvoidConstPointer:
-            SetParamVal<ParamType::TGLvoidConstPointer>(valueIn, valueOut);
-            break;
-        case ParamType::TGLvoidConstPointerPointer:
-            SetParamVal<ParamType::TGLvoidConstPointerPointer>(valueIn, valueOut);
             break;
         case ParamType::TGraphicsResetStatus:
             SetParamVal<ParamType::TGraphicsResetStatus>(valueIn, valueOut);
@@ -3358,6 +3179,9 @@ void InitParamValue(ParamType paramType, T valueIn, ParamValue *valueOut)
             break;
         case ParamType::TPointParameter:
             SetParamVal<ParamType::TPointParameter>(valueIn, valueOut);
+            break;
+        case ParamType::TPolygonMode:
+            SetParamVal<ParamType::TPolygonMode>(valueIn, valueOut);
             break;
         case ParamType::TPrimitiveMode:
             SetParamVal<ParamType::TPrimitiveMode>(valueIn, valueOut);

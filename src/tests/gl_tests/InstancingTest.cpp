@@ -110,7 +110,7 @@ class InstancingTest : public ANGLETest<>
             ANGLE_SKIP_TEST_IF(!IsGLExtensionEnabled("GL_EXT_instanced_arrays"));
         }
 
-        // TODO: Fix these.  http://anglebug.com/3129
+        // TODO: Fix these.  http://anglebug.com/42261805
         ANGLE_SKIP_TEST_IF(IsD3D9() && draw == Indexed && geometry == Point);
         ANGLE_SKIP_TEST_IF(IsD3D9() && IsAMD());
 
@@ -841,6 +841,47 @@ void main()
     EXPECT_GL_NO_ERROR();
     glDrawArrays(GL_TRIANGLES, 0, 3);
     EXPECT_GL_NO_ERROR();
+}
+
+// Regression test for D3D11 streaming of GL_DYNAMIC_DRAW buffers not taking into account instanced
+// attributes for buffer size calculations. http://crbug.com/1425606
+TEST_P(InstancingTestES3, D3D11StreamingInstancedData2)
+{
+    constexpr char kVS[] = R"(#version 300 es
+in float scale;
+void main()
+{
+    gl_Position = vec4(vec2(gl_VertexID % 2, gl_VertexID % 3) * scale, 0, 1);
+    gl_PointSize = 1.0;
+})";
+
+    constexpr char kFS[] = R"(#version 300 es
+precision mediump float;
+out vec4 color;
+void main()
+{
+    color = vec4(1, 0, 0, 1);
+})";
+
+    ANGLE_GL_PROGRAM(program, kVS, kFS);
+    glUseProgram(program);
+
+    GLBuffer buffer;
+    glBindBuffer(GL_ARRAY_BUFFER, buffer);
+
+    GLint loc = glGetAttribLocation(program, "scale");
+    glEnableVertexAttribArray(loc);
+    glVertexAttribPointer(loc, 1, GL_FLOAT, false, 0, 0);
+    glVertexAttribDivisor(loc, 10001);
+
+    for (size_t i = 0; i < 100; i++)
+    {
+        float data = 0.5f;
+        glBufferData(GL_ARRAY_BUFFER, sizeof(data), &data, GL_DYNAMIC_DRAW);
+
+        glDrawArrays(GL_POINTS, 0, 10000);
+        EXPECT_GL_NO_ERROR();
+    }
 }
 
 GTEST_ALLOW_UNINSTANTIATED_PARAMETERIZED_TEST(InstancingTestES3);
