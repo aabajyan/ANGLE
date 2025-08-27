@@ -1,5 +1,5 @@
-project(ANGLE LANGUAGES C CXX)
 cmake_minimum_required(VERSION 3.10)
+project(ANGLE LANGUAGES C CXX)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
@@ -10,6 +10,7 @@ include("${CMAKE_CURRENT_SOURCE_DIR}/webkit_patches/cmake/WebKitCommon-minimal.c
 include("${CMAKE_CURRENT_SOURCE_DIR}/webkit_patches/cmake/WebKitCompilerFlags-minimal.cmake")
 include("${CMAKE_CURRENT_SOURCE_DIR}/webkit_patches/cmake/WebKitMacros-minimal.cmake")
 include("${CMAKE_CURRENT_SOURCE_DIR}/webkit_patches/cmake/DetectSSE2.cmake")
+include(GNUInstallDirs)
 
 if (APPLE)
     if(IOS)
@@ -201,6 +202,17 @@ if (USE_ANGLE_EGL OR ENABLE_WEBGL)
     endif()
 
     target_link_libraries(ANGLE PRIVATE ${ZLIB_LIB} ${CMAKE_DL_LIBS})
+    if (is_apple)
+        target_link_libraries(ANGLE PRIVATE
+            "-framework CoreGraphics"
+            "-framework CoreFoundation"
+            "-framework IOKit"
+            "-framework Metal"
+            "-framework QuartzCore"
+            "-framework Foundation"
+            "-framework IOSurface"
+        )
+    endif()
 
     target_compile_definitions(ANGLEFramework INTERFACE ${gl_prototypes})
 
@@ -315,28 +327,28 @@ add_library(ANGLE::ANGLE ALIAS ANGLEFramework)
 if(TARGET ANGLE)
     install(TARGETS ANGLE
         EXPORT ANGLETargets
-        ARCHIVE DESTINATION lib
-        LIBRARY DESTINATION lib
-        RUNTIME DESTINATION bin
+        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
     )
 endif()
 if(TARGET GLESv2)
     install(TARGETS GLESv2
         EXPORT ANGLETargets
-        ARCHIVE DESTINATION lib
-        LIBRARY DESTINATION lib
-        RUNTIME DESTINATION bin
+        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
     )
 endif()
 if(TARGET EGL)
     install(TARGETS EGL
         EXPORT ANGLETargets
-        ARCHIVE DESTINATION lib
-        LIBRARY DESTINATION lib
-        RUNTIME DESTINATION bin
+        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
     )
 endif()
 
 install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/
-    DESTINATION include
+    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
 )
