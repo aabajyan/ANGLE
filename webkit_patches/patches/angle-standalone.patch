@@ -318,3 +318,15 @@ index 1af0c22..1e580de 100644
 +    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
  )
 \ No newline at end of file
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 1e580de..fdb52b6 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -29,6 +29,7 @@ elseif (ANDROID)
+     set(is_android TRUE)
+ elseif (UNIX)
+     set(is_linux TRUE)
++    set(USE_OPENGL ON)
+ endif ()
+ 
+ include(Compiler.cmake)

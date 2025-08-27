@@ -29,6 +29,7 @@ elseif (ANDROID)
     set(is_android TRUE)
 elseif (UNIX)
     set(is_linux TRUE)
+    set(USE_OPENGL ON)
 endif ()
 
 include(Compiler.cmake)
